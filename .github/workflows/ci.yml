@@ -1,0 +1,55 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v2
+      with:
+        java-version: '17'
+        distribution: 'adopt'
+
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+
+    - name: Install Frontend Dependencies
+      run: |
+        cd kpop-fansite-frontend
+        npm install
+
+    - name: Build Frontend
+      run: |
+        cd kpop-fansite-frontend
+        npm run build
+
+    - name: Build and Test Docker Images
+      run: |
+        docker-compose build
+        docker-compose up -d
+        docker-compose ps
+        sleep 30
+        docker-compose logs
+
+    - name: Run Tests
+      run: |
+        mvn test
+        cd kpop-fansite-frontend
+        npm test
+
+    - name: Clean up
+      run: docker-compose down 

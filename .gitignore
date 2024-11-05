@@ -1,30 +1,28 @@
-# 環境文件
-.env
-*.env
-gcp-key.json
-src/main/resources/application-prod.properties
-
-# 構建輸出
-target/
-build/
-dist/
-node_modules/
-
 # IDE
 .idea/
 .vscode/
 *.iml
-*.iws
-*.ipr
 
-# 數據卷
+# Dependencies
+node_modules/
+target/
+
+# Build
+build/
+dist/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# Docker volumes
 *_data/
 
-# 日誌
-logs/
-*.log
-
-# 其他
+# OS
 .DS_Store
-*.swp
-*.swo 
+Thumbs.db
