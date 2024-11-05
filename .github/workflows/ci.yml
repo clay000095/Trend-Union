@@ -7,9 +7,8 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
 
@@ -37,19 +36,67 @@ jobs:
         cd kpop-fansite-frontend
         npm run build
 
-    - name: Build and Test Docker Images
-      run: |
-        docker-compose build
-        docker-compose up -d
-        docker-compose ps
-        sleep 30
-        docker-compose logs
-
     - name: Run Tests
       run: |
         mvn test
         cd kpop-fansite-frontend
         npm test
 
-    - name: Clean up
-      run: docker-compose down 
+    # 保存構建產物
+    - name: Upload Backend Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: backend-jar
+        path: target/*.jar
+
+    - name: Upload Frontend Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: frontend-build
+        path: kpop-fansite-frontend/build
+
+  deploy:
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    # 下載構建產物
+    - name: Download Backend Artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: backend-jar
+        path: target
+
+    - name: Download Frontend Artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: frontend-build
+        path: kpop-fansite-frontend/build
+
+    # 登錄到 Docker Hub
+    - name: Login to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    # 構建和推送 Docker 映像
+    - name: Build and Push Docker Images
+      run: |
+        docker-compose build
+        docker-compose push
+
+    # 部署到服務器
+    - name: Deploy to Server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        script: |
+          cd /opt/kpop-fansite
+          docker-compose pull
+          docker-compose down
+          docker-compose up -d
