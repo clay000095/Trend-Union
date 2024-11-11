@@ -12,10 +12,8 @@ public class Star {
     private String name;
     private String groupName;
     private String position;
-    private String birthDate;
-    private String imageUrl;
     private String description;
-
+    
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -28,12 +26,6 @@ public class Star {
     
     public String getPosition() { return position; }
     public void setPosition(String position) { this.position = position; }
-    
-    public String getBirthDate() { return birthDate; }
-    public void setBirthDate(String birthDate) { this.birthDate = birthDate; }
-    
-    public String getImageUrl() { return imageUrl; }
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
     
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }

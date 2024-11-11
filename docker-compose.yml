@@ -9,6 +9,7 @@ services:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./my.cnf:/etc/mysql/conf.d/my.cnf
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -62,12 +63,13 @@ services:
       rabbitmq:
         condition: service_healthy
 
-  frontend:
-    build:
-      context: ./kpop-fansite-frontend
-    image: ${DOCKER_USERNAME}/kpop-fansite-frontend:${GITHUB_SHA}
+  nginx:
+    image: nginx:alpine
     ports:
       - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./kpop-fansite-frontend/build:/usr/share/nginx/html
     depends_on:
       - app
 
