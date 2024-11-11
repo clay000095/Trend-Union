@@ -1,5 +1,7 @@
 package com.example.kpopfansite.util;
 
+import com.example.kpopfansite.model.Star;
+import com.example.kpopfansite.repository.StarRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
